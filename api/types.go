@@ -96,6 +96,22 @@ type AlertCondition struct {
 	ViolationCloseTimer int                       `json:"violation_close_timer,omitempty"`
 }
 
+type AlertIncident struct {
+	PolicyID            int                       `json:"-"`
+	ID                  int                       `json:"id,omitempty"`
+	Type                string                    `json:"type,omitempty"`
+	Name                string                    `json:"name,omitempty"`
+	Enabled             bool                      `json:"enabled"`
+	Entities            []string                  `json:"entities,omitempty"`
+	Metric              string                    `json:"metric,omitempty"`
+	RunbookURL          string                    `json:"runbook_url,omitempty"`
+	Terms               []AlertConditionTerm      `json:"terms,omitempty"`
+	UserDefined         AlertConditionUserDefined `json:"user_defined,omitempty"`
+	Scope               string                    `json:"condition_scope,omitempty"`
+	GCMetric            string                    `json:"gc_metric,omitempty"`
+	ViolationCloseTimer int                       `json:"violation_close_timer,omitempty"`
+}
+
 // AlertNrqlQuery represents a NRQL query to use with a NRQL alert condition
 type AlertNrqlQuery struct {
 	Query      string `json:"query,omitempty"`
