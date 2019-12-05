@@ -126,3 +126,88 @@ func TestOpenListAlertIncidents(t *testing.T) {
 		t.Fatalf("Alert incidents not parsed correctly: %s", diff)
 	}
 }
+
+func TestAcknowledgeAlertIncident(t *testing.T) {
+	c := newTestAPIClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`
+			{
+				"incidents": [
+			    {
+			      "id": 42,
+				  "opened_at": 1575502560942,
+			      "incident_preference": "PER_CONDITION",
+			      "links": {
+			        "violations": [
+			          123456789
+			        ],
+			        "policy_id": 12345
+				  }
+				}
+				]
+			}
+			`))
+	}))
+
+	err := c.AcknowledgeAlertIncident(42)
+	if err != nil {
+		t.Log(err)
+		t.Fatal("AckAlertIncident error")
+	}
+}
+
+func TestAcknowledgeAlertIncident_failing(t *testing.T) {
+	c := newTestAPIClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusConflict)
+	}))
+
+	err := c.CloseAlertIncident(42)
+	if err == nil {
+		t.Fatal("AckAlertIncident expected an error")
+	}
+}
+
+func TestCloseAlertIncident(t *testing.T) {
+	c := newTestAPIClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`
+			{
+				"incidents": [
+			    {
+			      "id": 42,
+				  "opened_at": 1575502560942,
+				  "closed_at": 1575502560943,
+			      "incident_preference": "PER_CONDITION",
+			      "links": {
+			        "violations": [
+			          123456789
+			        ],
+			        "policy_id": 12345
+				  }
+				}
+				]
+			}
+			`))
+	}))
+
+	err := c.AcknowledgeAlertIncident(42)
+	if err != nil {
+		t.Log(err)
+		t.Fatal("CloseAlertIncident error")
+	}
+}
+
+func TestCloseAlertIncident_failing(t *testing.T) {
+	c := newTestAPIClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusConflict)
+	}))
+
+	err := c.CloseAlertIncident(42)
+	if err == nil {
+		t.Fatal("CloseAlertIncident expected an error")
+	}
+}

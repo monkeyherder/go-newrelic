@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/url"
 )
 
@@ -40,6 +41,12 @@ func (c *Client) queryAlertIncidents(onlyOpen bool, excludeViolations bool) ([]A
 	return incidents, nil
 }
 
+func (c *Client) postAlertIncident(id int, verb string) error {
+	path := fmt.Sprintf("/alerts_incidents/%v/%v.json", id, verb)
+	_, err := c.Do("POST", path, nil, nil)
+	return err
+}
+
 // ListAlertIncidents returns all alert incidents
 func (c *Client) ListAlertIncidents() ([]AlertIncident, error) {
 	return c.queryAlertIncidents(false, false)
@@ -50,3 +57,10 @@ func (c *Client) ListOpenAlertIncidents() ([]AlertIncident, error) {
 	return c.queryAlertIncidents(true, false)
 }
 
+func (c *Client) AcknowledgeAlertIncident(id int) error {
+	return c.postAlertIncident(id, "acknowledge")
+}
+
+func (c *Client) CloseAlertIncident(id int) error {
+	return c.postAlertIncident(id, "close")
+}
