@@ -13,16 +13,18 @@ func TestListAlertIncidents(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`
 			{
-				"conditions": [
-					{
-						"id": 1234,
-						"type": "browser_metric",
-						"name": "End User Apdex (Low)",
-						"enabled": false,
-						"entities": ["126408", "127809"],
-						"metric": "end_user_apdex",
-						"condition_scope": "application"
-					}
+				"incidents": [
+			    {
+			      "id": 42,
+			      "opened_at": 1575502560942,
+			      "incident_preference": "PER_CONDITION",
+			      "links": {
+			        "violations": [
+			          35204408
+			        ],
+			        "policy_id": 28069
+			      }
+			    }
 				]
 			}
 			`))
@@ -30,18 +32,17 @@ func TestListAlertIncidents(t *testing.T) {
 
 	expected := []AlertIncident{
 		{
-			ID:       1234,
-			Type:     "browser_metric",
-			Name:     "End User Apdex (Low)",
-			Enabled:  false,
-			Entities: []string{"126408", "127809"},
-			Metric:   "end_user_apdex",
-			Scope:    "application",
+			ID:                 42,
+			OpenedAt:           1575502560942,
+			IncidentPreference: "PER_CONDITION",
+			Links: AlertIncidentLink{
+				Violations: []int{35204408},
+				PolicyId:   28069,
+			},
 		},
 	}
 
-	policyID := 123
-	alertIncidents, err := c.queryAlertIncidents(policyID)
+	alertIncidents, err := c.queryAlertIncidents()
 	if err != nil {
 		t.Log(err)
 		t.Fatal("GetAlertIncident error")
@@ -51,6 +52,6 @@ func TestListAlertIncidents(t *testing.T) {
 		t.Fatal("GetAlertIncident error")
 	}
 	if diff := cmp.Diff(alertIncidents, expected); diff != "" {
-		t.Fatalf("Alert conditions not parsed correctly: %s", diff)
+		t.Fatalf("Alert incidents not parsed correctly: %s", diff)
 	}
 }
