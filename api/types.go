@@ -99,12 +99,13 @@ type AlertCondition struct {
 type AlertIncident struct {
 	ID                 int               `json:"id,omitempty"`
 	OpenedAt           int               `json:"opened_at,omitempty"`
+	ClosedAt           int               `json:"closed_at,omitempty"`
 	IncidentPreference string            `json:"incident_preference,omitempty"`
 	Links              AlertIncidentLink `json:"links"`
 }
 
 type AlertIncidentLink struct {
-	Violations []int `json:"violations"`
+	Violations []int `json:"violations,omitempty"`
 	PolicyId   int   `json:"policy_id"`
 }
 

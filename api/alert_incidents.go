@@ -4,7 +4,7 @@ import (
 	"net/url"
 )
 
-func (c *Client) queryAlertIncidents() ([]AlertIncident, error) {
+func (c *Client) queryAlertIncidents(onlyOpen bool, excludeViolations bool) ([]AlertIncident, error) {
 	incidents := []AlertIncident{}
 
 	reqURL, err := url.Parse("/alerts_incidents.json")
@@ -13,6 +13,12 @@ func (c *Client) queryAlertIncidents() ([]AlertIncident, error) {
 	}
 
 	qs := reqURL.Query()
+	if onlyOpen {
+		qs.Set("only_open", "true")
+	}
+	if excludeViolations {
+		qs.Set("exclude_violations", "true")
+	}
 
 	reqURL.RawQuery = qs.Encode()
 
@@ -36,5 +42,11 @@ func (c *Client) queryAlertIncidents() ([]AlertIncident, error) {
 
 // ListAlertIncidents returns all alert incidents
 func (c *Client) ListAlertIncidents() ([]AlertIncident, error) {
-	return c.queryAlertIncidents()
+	return c.queryAlertIncidents(false, false)
 }
+
+// ListOpenAlertIncidents returns open alert incidents
+func (c *Client) ListOpenAlertIncidents() ([]AlertIncident, error) {
+	return c.queryAlertIncidents(true, false)
+}
+
