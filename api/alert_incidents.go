@@ -48,13 +48,8 @@ func (c *Client) postAlertIncident(id int, verb string) error {
 }
 
 // ListAlertIncidents returns all alert incidents
-func (c *Client) ListAlertIncidents() ([]AlertIncident, error) {
-	return c.queryAlertIncidents(false, false)
-}
-
-// ListOpenAlertIncidents returns open alert incidents
-func (c *Client) ListOpenAlertIncidents() ([]AlertIncident, error) {
-	return c.queryAlertIncidents(true, false)
+func (c *Client) ListAlertIncidents(only_open bool, exclude_violations bool) ([]AlertIncident, error) {
+	return c.queryAlertIncidents(only_open, exclude_violations)
 }
 
 func (c *Client) AcknowledgeAlertIncident(id int) error {
