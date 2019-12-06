@@ -5,7 +5,18 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/spf13/cobra"
 	"strconv"
+	"time"
+
+	"github.com/paultyng/go-newrelic/v4/api"
 )
+
+type HumanReadableAlertIncident struct {
+	ID                 int               `json:"id,omitempty"`
+	OpenedAt           time.Time         `json:"opened_at,omitempty"`
+	ClosedAt           *time.Time         `json:"closed_at,omitempty"`
+	IncidentPreference string            `json:"incident_preference,omitempty"`
+	Links              api.AlertIncidentLink `json:"links"`
+}
 
 func makeIncidentsCmd(dst cobra.Command) *cobra.Command {
 	src := cobra.Command{
@@ -40,6 +51,35 @@ var getAlertIncidentsCmd = makeIncidentsCmd(cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		format, err := cmd.Flags().GetString("format")
+
+		if err != nil {
+			fmt.Errorf("Could not get format flag: %w", err)
+		}
+
+		if format != "json" {
+			newResources := []HumanReadableAlertIncident{}
+			for _, incident := range resources {
+				humanReadable :=
+				HumanReadableAlertIncident{
+					ID: incident.ID,
+					OpenedAt: time.Unix(int64(incident.OpenedAt/1000), 0),
+					IncidentPreference: incident.IncidentPreference,
+					Links: incident.Links,
+				}
+
+				if incident.ClosedAt != 0 {
+					closedTime := time.Unix(int64(incident.ClosedAt/1000),0)
+					humanReadable.ClosedAt = &closedTime
+				}
+
+				newResources = append(newResources, humanReadable)
+			}
+
+			return outputList(cmd, newResources)
+		}
+
 		return outputList(cmd, resources)
 	},
 })
