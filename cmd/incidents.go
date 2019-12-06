@@ -11,11 +11,12 @@ import (
 )
 
 type HumanReadableAlertIncident struct {
-	ID                 int               `json:"id,omitempty"`
-	OpenedAt           time.Time         `json:"opened_at,omitempty"`
-	ClosedAt           *time.Time         `json:"closed_at,omitempty"`
-	IncidentPreference string            `json:"incident_preference,omitempty"`
-	Links              api.AlertIncidentLink `json:"links"`
+	ID                 int
+	OpenedAt           time.Time
+	ClosedAt           *time.Time
+	TimeOpen		   time.Duration
+	IncidentPreference string
+	Links              api.AlertIncidentLink
 }
 
 func makeIncidentsCmd(dst cobra.Command) *cobra.Command {
@@ -58,6 +59,7 @@ var getAlertIncidentsCmd = makeIncidentsCmd(cobra.Command{
 			fmt.Errorf("Could not get format flag: %w", err)
 		}
 
+		currentEpochNanos := time.Now().UnixNano()
 		if format != "json" {
 			newResources := []HumanReadableAlertIncident{}
 			for _, incident := range resources {
@@ -72,8 +74,10 @@ var getAlertIncidentsCmd = makeIncidentsCmd(cobra.Command{
 				if incident.ClosedAt != 0 {
 					closedTime := time.Unix(int64(incident.ClosedAt/1000),0)
 					humanReadable.ClosedAt = &closedTime
+					humanReadable.TimeOpen = time.Duration(int64(incident.ClosedAt - incident.OpenedAt))
 				}
 
+				humanReadable.TimeOpen = time.Duration((currentEpochNanos/1000000 - int64(incident.OpenedAt)) * 1000000)
 				newResources = append(newResources, humanReadable)
 			}
 
