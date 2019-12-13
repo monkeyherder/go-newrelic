@@ -59,34 +59,41 @@ var getAlertIncidentsCmd = makeIncidentsCmd(cobra.Command{
 			fmt.Errorf("Could not get format flag: %w", err)
 		}
 
-		currentEpochNanos := time.Now().UnixNano()
 		if format != "json" {
-			newResources := []HumanReadableAlertIncident{}
-			for _, incident := range resources {
-				humanReadable :=
-				HumanReadableAlertIncident{
-					ID: incident.ID,
-					OpenedAt: time.Unix(int64(incident.OpenedAt/1000), 0),
-					IncidentPreference: incident.IncidentPreference,
-					Links: incident.Links,
-				}
+			formattedResources := formatIncidents(resources)
 
-				if incident.ClosedAt != 0 {
-					closedTime := time.Unix(int64(incident.ClosedAt/1000),0)
-					humanReadable.ClosedAt = &closedTime
-					humanReadable.TimeOpen = time.Duration(int64(incident.ClosedAt - incident.OpenedAt))
-				}
-
-				humanReadable.TimeOpen = time.Duration((currentEpochNanos/1000000 - int64(incident.OpenedAt)) * 1000000)
-				newResources = append(newResources, humanReadable)
-			}
-
-			return outputList(cmd, newResources)
+			return outputList(cmd, formattedResources)
 		}
 
 		return outputList(cmd, resources)
 	},
 })
+
+func formatIncidents(resources []api.AlertIncident) []HumanReadableAlertIncident {
+	currentEpochNanos := time.Now().UnixNano()
+
+	newResources := []HumanReadableAlertIncident{}
+	for _, incident := range resources {
+		humanReadable :=
+			HumanReadableAlertIncident{
+				ID:                 incident.ID,
+				OpenedAt:           time.Unix(int64(incident.OpenedAt/1000), 0),
+				IncidentPreference: incident.IncidentPreference,
+				Links:              incident.Links,
+			}
+
+		if incident.ClosedAt != 0 {
+			closedTime := time.Unix(int64(incident.ClosedAt/1000), 0)
+			humanReadable.ClosedAt = &closedTime
+			humanReadable.TimeOpen = time.Duration(int64(incident.ClosedAt - incident.OpenedAt))
+		}
+
+		humanReadable.TimeOpen = time.Duration((currentEpochNanos/1000000 - int64(incident.OpenedAt)) * 1000000)
+		newResources = append(newResources, humanReadable)
+	}
+
+	return newResources
+}
 
 var closeIncidentsCmd = makeIncidentsCmd(cobra.Command{
 	Use:  "incidents <id> [more id args]",
