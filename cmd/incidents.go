@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/imdario/mergo"
-	"github.com/spf13/cobra"
 	"strconv"
 	"time"
+
+	"github.com/imdario/mergo"
+	"github.com/spf13/cobra"
 
 	"github.com/paultyng/go-newrelic/v4/api"
 )
@@ -14,7 +15,7 @@ type HumanReadableAlertIncident struct {
 	ID                 int
 	OpenedAt           time.Time
 	ClosedAt           *time.Time
-	TimeOpen		   time.Duration
+	TimeOpen           time.Duration
 	IncidentPreference string
 	Links              api.AlertIncidentLink
 }
@@ -39,13 +40,13 @@ var getAlertIncidentsCmd = makeIncidentsCmd(cobra.Command{
 		only_open, err := cmd.Flags().GetBool("only-open")
 
 		if err != nil {
-			fmt.Errorf("Could not get only-open flag: %w", err)
+			return fmt.Errorf("Could not get only-open flag: %w", err)
 		}
 
 		exclude_violations, err := cmd.Flags().GetBool("exclude-violations")
 
 		if err != nil {
-			fmt.Errorf("Could not get only-open flag: %w", err)
+			return fmt.Errorf("Could not get only-open flag: %w", err)
 		}
 
 		resources, err := client.ListAlertIncidents(only_open, exclude_violations)
@@ -56,7 +57,7 @@ var getAlertIncidentsCmd = makeIncidentsCmd(cobra.Command{
 		format, err := cmd.Flags().GetString("format")
 
 		if err != nil {
-			fmt.Errorf("Could not get format flag: %w", err)
+			return fmt.Errorf("Could not get format flag: %w", err)
 		}
 
 		if format != "json" {

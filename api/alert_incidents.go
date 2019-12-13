@@ -41,9 +41,9 @@ func (c *Client) queryAlertIncidents(onlyOpen bool, excludeViolations bool) ([]A
 	return incidents, nil
 }
 
-func (c *Client) postAlertIncident(id int, verb string) error {
+func (c *Client) updateAlertIncident(id int, verb string) error {
 	path := fmt.Sprintf("/alerts_incidents/%v/%v.json", id, verb)
-	_, err := c.Do("POST", path, nil, nil)
+	_, err := c.Do("PUT", path, nil, nil)
 	return err
 }
 
@@ -53,9 +53,9 @@ func (c *Client) ListAlertIncidents(only_open bool, exclude_violations bool) ([]
 }
 
 func (c *Client) AcknowledgeAlertIncident(id int) error {
-	return c.postAlertIncident(id, "acknowledge")
+	return c.updateAlertIncident(id, "acknowledge")
 }
 
 func (c *Client) CloseAlertIncident(id int) error {
-	return c.postAlertIncident(id, "close")
+	return c.updateAlertIncident(id, "close")
 }
