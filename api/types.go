@@ -96,6 +96,19 @@ type AlertCondition struct {
 	ViolationCloseTimer int                       `json:"violation_close_timer,omitempty"`
 }
 
+type AlertIncident struct {
+	ID                 int               `json:"id,omitempty"`
+	OpenedAt           int               `json:"opened_at,omitempty"`
+	ClosedAt           int               `json:"closed_at,omitempty"`
+	IncidentPreference string            `json:"incident_preference,omitempty"`
+	Links              AlertIncidentLink `json:"links"`
+}
+
+type AlertIncidentLink struct {
+	Violations []int `json:"violations,omitempty"`
+	PolicyId   int   `json:"policy_id"`
+}
+
 // AlertNrqlQuery represents a NRQL query to use with a NRQL alert condition
 type AlertNrqlQuery struct {
 	Query      string `json:"query,omitempty"`
